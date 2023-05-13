@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+  "scripts": {
+    "start": "webpack serve"
+  },
   "dependencies": {
     "ethers": "^6.3.0",
     "node-polyfill-webpack-plugin": "^2.0.1",
