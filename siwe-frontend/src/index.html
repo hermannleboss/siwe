@@ -8,6 +8,20 @@
             padding: 15px;
             margin: 10px;
         }
+        .hidden {
+            display: none
+        }
+
+        table, th, td {
+            border: 1px black solid;
+        }
+
+        .avatar {
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            width: 20px;
+            height: 20px;
+        }
     </style>
 </head>
 
@@ -15,5 +29,18 @@
 <div><button id="connectWalletBtn">Connect wallet</button></div>
 <div><button id="siweBtn">Sign-in with Ethereum</button></div>
 <div><button id="infoBtn">Get session information</button></div>
+<div class="hidden" id="welcome">
+</div>
+<div class="hidden" id="profile">
+    <h3>ENS Metadata:</h3>
+    <div id="ensLoader"></div>
+    <div id="ensContainer" class="hidden">
+        <table id="ensTable">
+        </table>
+    </div>
+</div>
+<div class="hidden" id="noProfile">
+    No ENS Profile detected.
+</div>
 </body>
 </html>
