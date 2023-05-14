@@ -6,9 +6,10 @@ const origin = window.location.origin;
 const provider = new BrowserProvider(window.ethereum);
 
 const BACKEND_ADDR = "http://localhost:3000";
-
 async function createSiweMessage(address, statement) {
-    const res = await fetch(`${BACKEND_ADDR}/nonce`);
+    const res = await fetch(`${BACKEND_ADDR}/nonce`, {
+        credentials: 'include',
+    });
     const message = new SiweMessage({
         domain,
         address,
@@ -26,35 +27,36 @@ function connectWallet() {
         .catch(() => console.log('user rejected request'));
 }
 
-let message = null;
-let signature = null;
-
 async function signInWithEthereum() {
     const signer = await provider.getSigner();
 
-    message = await createSiweMessage(
-        signer.address,
+    const message = await createSiweMessage(
+        await signer.getAddress(),
         'Sign in with Ethereum to the app.'
     );
-    console.log(message);
-    signature = await signer.signMessage(message);
-    console.log(signature);
-}
+    const signature = await signer.signMessage(message);
 
-async function sendForVerification() {
     const res = await fetch(`${BACKEND_ADDR}/verify`, {
         method: "POST",
         headers: {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({ message, signature }),
+        credentials: 'include'
+    });
+    console.log(await res.text());
+}
+
+async function getInformation() {
+    const res = await fetch(`${BACKEND_ADDR}/personal_information`, {
+        credentials: 'include',
     });
     console.log(await res.text());
 }
 
 const connectWalletBtn = document.getElementById('connectWalletBtn');
 const siweBtn = document.getElementById('siweBtn');
-const verifyBtn = document.getElementById('verifyBtn');
+const infoBtn = document.getElementById('infoBtn');
 connectWalletBtn.onclick = connectWallet;
 siweBtn.onclick = signInWithEthereum;
-verifyBtn.onclick = sendForVerification;
+infoBtn.onclick = getInformation;
