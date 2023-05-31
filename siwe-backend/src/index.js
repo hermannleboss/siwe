@@ -68,4 +68,7 @@ app.get('/personal_information', function (req, res) {
     res.send(`You are authenticated and your address is: ${req.session.siwe.address}`);
 });
 
-app.listen(3000);
+const port = parseInt(process.env.PORT) || 8080;
+app.listen(port, () => {
+    console.log(`helloworld: listening on port ${port}`);
+});

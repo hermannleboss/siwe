@@ -49,6 +49,8 @@ async function signInWithEthereum() {
         'Sign in with Ethereum to the app.'
     );
     const signature = await signer.signMessage(message);
+    console.log("message : '", message, "'")
+    console.log("signature : '", signature, "'")
 
     const res = await fetch(`${BACKEND_ADDR}/verify`, {
         method: "POST",
