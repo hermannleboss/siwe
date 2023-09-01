@@ -1,7 +1,9 @@
 import cors from 'cors';
 import express from 'express';
 import Session from 'express-session';
-import { generateNonce, SiweMessage } from 'siwe';
+import {generateNonce, SiweMessage} from 'siwe';
+import jwt from 'jsonwebtoken';
+
 
 const app = express();
 app.use(express.json());
@@ -10,57 +12,51 @@ app.use(cors({
     credentials: true,
 }))
 
-app.use(Session({
-    name: 'siwe-quickstart',
-    secret: "siwe-quickstart-secret",
-    resave: true,
-    saveUninitialized: true,
-    cookie: { secure: false, sameSite: true }
-}));
-
 app.get('/nonce', async function (req, res) {
-    req.session.nonce = generateNonce();
+
     res.setHeader('Content-Type', 'text/plain');
-    res.status(200).send(req.session.nonce);
+    res.send(generateNonce());
 });
+const secretKey = 'your-secret-key';
+const sessionExpiry = '1h'; // Set the session expiry time to 1 hour.
 
 app.post('/verify', async function (req, res) {
+    const {message, signature} = req.body;
+    const SIWEObject = new SiweMessage(message);
+
+
     try {
-        if (!req.body.message) {
-            res.status(422).json({ message: 'Expected prepareMessage object as body.' });
-            return;
-        }
-
-        let SIWEObject = new SiweMessage(req.body.message);
-        const { data: message } = await SIWEObject.verify({ signature: req.body.signature, nonce: req.session.nonce });
-
-        req.session.siwe = message;
-        req.session.cookie.expires = new Date(message.expirationTime);
-        req.session.save(() => res.status(200).send(true));
+        const {data: newMessage} = await SIWEObject.verify({signature});
+        // convert newMessage object into a  plain javascript object JSON
+        const value = JSON.parse(JSON.stringify(newMessage));
+        const token = jwt.sign(value, secretKey, {expiresIn: sessionExpiry});
+        res.status(200).json({token});
     } catch (e) {
-        req.session.siwe = null;
-        req.session.nonce = null;
-        console.error(e);
-        switch (e) {
-            case ErrorTypes.EXPIRED_MESSAGE: {
-                req.session.save(() => res.status(440).json({ message: e.message }));
-                break;
-            }
-            case ErrorTypes.INVALID_SIGNATURE: {
-                req.session.save(() => res.status(422).json({ message: e.message }));
-                break;
-            }
-            default: {
-                req.session.save(() => res.status(500).json({ message: e.message }));
-                break;
-            }
-        }
+        console.log("Error: ", e)
+        res.send(false);
     }
 });
 
+// verifiying the token
+app.get('/personal_info', function (req, res) {
+    const token = req.headers.authorization;
+    console.log("token : ", token)
+    jwt.verify(token, secretKey, (err, decoded) => {
+        if (err) {
+            // Token is invalid
+            return res.status(401).json({message: 'Token is invalid'});
+        }
+        // Token is valid, and `decoded` contains the payload data
+        console.log({decoded: decoded})
+
+        res.send(decoded);
+    });
+});
+
+
 app.get('/personal_information', function (req, res) {
     if (!req.session.siwe) {
-        res.status(401).json({ message: 'You have to first sign_in' });
+        res.status(401).json({message: 'You have to first sign_in'});
         return;
     }
     console.log("User is authenticated!");
@@ -68,7 +64,7 @@ app.get('/personal_information', function (req, res) {
     res.send(`You are authenticated and your address is: ${req.session.siwe.address}`);
 });
 
-const port = parseInt(process.env.PORT) || 80;
+const port = parseInt(process.env.PORT) || 3000;
 app.listen(port, () => {
     console.log(`helloworld: listening on port ${port}`);
 });

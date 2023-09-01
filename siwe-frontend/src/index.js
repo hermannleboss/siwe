@@ -1,5 +1,5 @@
-import { BrowserProvider } from 'ethers';
-import { SiweMessage } from 'siwe';
+import {BrowserProvider} from 'ethers';
+import {SiweMessage} from 'siwe';
 
 const domain = window.location.host;
 const origin = window.location.origin;
@@ -16,6 +16,7 @@ const ensTableElm = document.getElementById('ensTable');
 let address;
 
 const BACKEND_ADDR = "http://localhost:3000";
+
 async function createSiweMessage(address, statement) {
     const res = await fetch(`${BACKEND_ADDR}/nonce`, {
         credentials: 'include',
@@ -57,7 +58,7 @@ async function signInWithEthereum() {
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ message, signature }),
+        body: JSON.stringify({message, signature}),
         credentials: 'include'
     });
 
@@ -65,9 +66,18 @@ async function signInWithEthereum() {
         console.error(`Failed in getInformation: ${res.statusText}`);
         return
     }
-    console.log(await res.text());
+    const {token} = await res.json();
+    const data = await fetch(`${BACKEND_ADDR}/personal_info`, {
+        method: "GET",
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token,
+        }
+    });
 
-    displayENSProfile();
+    console.log("response",await data.json());
+
+    // displayENSProfile();
 }
 
 async function getInformation() {
