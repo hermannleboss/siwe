@@ -1,6 +1,5 @@
 import cors from 'cors';
 import express from 'express';
-import Session from 'express-session';
 import {generateNonce, SiweMessage} from 'siwe';
 import jwt from 'jsonwebtoken';
 
@@ -54,17 +53,17 @@ app.get('/personal_info', function (req, res) {
 });
 
 
-app.get('/personal_information', function (req, res) {
-    if (!req.session.siwe) {
-        res.status(401).json({message: 'You have to first sign_in'});
-        return;
-    }
-    console.log("User is authenticated!");
-    res.setHeader('Content-Type', 'text/plain');
-    res.send(`You are authenticated and your address is: ${req.session.siwe.address}`);
-});
+// app.get('/personal_information', function (req, res) {
+//     if (!req.session.siwe) {
+//         res.status(401).json({message: 'You have to first sign_in'});
+//         return;
+//     }
+//     console.log("User is authenticated!");
+//     res.setHeader('Content-Type', 'text/plain');
+//     res.send(`You are authenticated and your address is: ${req.session.siwe.address}`);
+// });
 
-const port = parseInt(process.env.PORT) || 3000;
+const port = parseInt(process.env.PORT) || 80;
 app.listen(port, () => {
     console.log(`helloworld: listening on port ${port}`);
 });
