@@ -1,0 +1,16 @@
+_id: env_ce6087a49d9bc851b69069f053b34e96b6559a03
+type: Environment
+parentId: wrk_a1bce50491a843beaba74a739efd62ea
+modified: 1693731808922
+created: 1681380522921
+name: Base Environment
+data:
+  endpoint_live: https://siwe-backend-kvehw4df5q-uc.a.run.app
+  endpoint_local: http://localhost:3000
+dataPropertyOrder:
+  "&":
+    - endpoint_live
+    - endpoint_local
+color: null
+isPrivate: false
+metaSortKey: 1681380522921
