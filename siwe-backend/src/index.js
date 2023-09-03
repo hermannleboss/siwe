@@ -39,15 +39,13 @@ app.post('/verify', async function (req, res) {
 // verifiying the token
 app.get('/personal_info', function (req, res) {
     const token = req.headers.authorization;
-    console.log("token : ", token)
     jwt.verify(token, secretKey, (err, decoded) => {
         if (err) {
             // Token is invalid
             return res.status(401).json({message: 'Token is invalid'});
         }
-        // Token is valid, and `decoded` contains the payload data
-        console.log({decoded: decoded})
 
+        // Token is valid, and `decoded` contains the payload data
         res.send(decoded);
     });
 });
