@@ -15,7 +15,7 @@ const ensTableElm = document.getElementById('ensTable');
 
 let address;
 
-const BACKEND_ADDR = "http://localhost:3000";
+const BACKEND_ADDR = "https://siwe-backend-kvehw4df5q-uc.a.run.app";
 
 async function createSiweMessage(address, statement) {
     const res = await fetch(`${BACKEND_ADDR}/nonce`, {
